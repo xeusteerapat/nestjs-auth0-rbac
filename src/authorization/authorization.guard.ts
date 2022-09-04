@@ -7,9 +7,18 @@ import {
 import { expressjwt, GetVerificationKey } from 'express-jwt';
 import { expressJwtSecret } from 'jwks-rsa';
 import { promisify } from 'util';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
+  private AUTH0_AUDIENCE;
+  private AUTH0_DOMAIN;
+
+  constructor(private configService: ConfigService) {
+    this.AUTH0_AUDIENCE = this.configService.get('AUTH0_AUDIENCE');
+    this.AUTH0_DOMAIN = this.configService.get('AUTH0_DOMAIN');
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.getArgByIndex(0);
     const res = context.getArgByIndex(1);
@@ -20,10 +29,10 @@ export class AuthorizationGuard implements CanActivate {
           cache: true,
           rateLimit: true,
           jwksRequestsPerMinute: 5,
-          jwksUri: '',
+          jwksUri: `${this.AUTH0_DOMAIN}.well-known/jwks.json`,
         }) as GetVerificationKey,
-        audience: '',
-        issuer: '',
+        audience: this.AUTH0_AUDIENCE,
+        issuer: this.AUTH0_DOMAIN,
         algorithms: ['RS256'],
       }),
     );
