@@ -13,4 +13,8 @@ export class AppService {
   getPrivate(): string {
     return 'Private Route';
   }
+
+  getAdmin(): string {
+    return 'Admin Only';
+  }
 }

@@ -1,6 +1,7 @@
 import { AuthorizationGuard } from './authorization/authorization.guard';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, SetMetadata, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
+import { PermissionsGuard } from './authorization/permissions.guard';
 
 @Controller()
 export class AppController {
@@ -20,5 +21,12 @@ export class AppController {
   @Get('/private')
   getPrivate(): string {
     return this.appService.getPrivate();
+  }
+
+  @UseGuards(AuthorizationGuard, PermissionsGuard)
+  @SetMetadata('permissions', ['admin:read'])
+  @Get('/admin')
+  getAdmin(): string {
+    return this.appService.getAdmin();
   }
 }
